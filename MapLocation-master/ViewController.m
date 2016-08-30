@@ -33,14 +33,20 @@
     if (![CLLocationManager locationServicesEnabled] || [CLLocationManager authorizationStatus] != kCLAuthorizationStatusAuthorizedWhenInUse) {
         [_manager requestWhenInUseAuthorization]; //向用户请求访问定位服务的权限
     }
+     //设置代理
     _manager.delegate = self;
+    //设置定位精度
     _manager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters;
+    //定位频率,每隔多少米定位一次
     _manager.distanceFilter = 10.0f;
+    //启动跟踪定位
     [_manager startUpdatingLocation];
-    //定位代理经纬度回调
 }
 
+#pragma mark 跟踪定位代理方法,每次位置发生变化即会执行（只要定位到相应位置）
+//可以通过模拟器设置一个虚拟位置，否则在模拟器中无法调用此方法
 -(void)locationManager:(CLLocationManager *)manager didUpdateToLocation:(CLLocation *)newLocation fromLocation:(CLLocation *)oldLocation {
+    //如果不需要实时定位，使用完即使关闭定位服务
     [_manager stopUpdatingLocation];
     CLGeocoder * geoCoder = [[CLGeocoder alloc] init];
     [geoCoder reverseGeocodeLocation:newLocation completionHandler:^(NSArray *placemarks, NSError *error) {
@@ -51,11 +57,6 @@
             _cityLabel.text = [location objectForKey:@"State"];
         }
     }];
-}
-
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
 }
 
 @end
